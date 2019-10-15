@@ -1,0 +1,53 @@
+[STEPS FOR KUBERNETES MASTER MACHINE]
+
+1. yum update
+2. yum install -y docker
+3. systemctl enable docker && systemctl start docker
+4. docker version
+5. =======================================================================
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+	[kubernetes]
+	name=Kubernetes
+		baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+		enabled=1
+		gpgcheck=1
+		repo_gpgcheck=1
+		gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+============================================================================
+6. sestatus
+7. vi /etc/sysconfig/selinux
+8. reboot
+9. sestatus
+10. yum install -y kubelet kubeadm kubectl
+11. systemctl enable kubelet && systemctl start kubelet
+12. swapoff -a
+13. =========================================================================
+cat <<EOF >  /etc/sysctl.d/k8s.conf
+   net.bridge.bridge-nf-call-ip6tables = 1
+   net.bridge.bridge-nf-call-iptables = 1
+EOF
+=========================================================================
+14. sysctl --system
+15. kubeadm init --apiserver-advertise-address=192.168.10.10 --pod-network-cidr=192.168.0.0/16 --service-cidr=192.168.2.0/24
+16. mkdir -p $HOME/.kube
+17. sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+18. sudo chown $(id -u):$(id -g) $HOME/.kube/config
+19. kubectl get nodes
+20. kubectl get pods --all-namespaces
+21. kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+22. kubectl get pods --all-namespaces
+23. kubectl get nodes
+24. kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+25. kubectl get pods --all-namespaces
+26. kubectl get pods --all-namespaces
+27. cd $HOME/.kube/
+28. Download kubectl for Windows - https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/windows/amd64/kubectl.exe
+29. Access URL for UI Dashbaord - http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/.
+28. kubectl get namespace
+29. kubectl describe serviceaccounts
+30. kubectl describe serviceaccount default -n kube-system
+31. kubectl describe serviceaccount default -n kube-system
+32. kubectl describe secret default-token-5f757 -n kube-system
+33. kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
+----------------------------------------------------------------------------------------------------------------------------------------------------
